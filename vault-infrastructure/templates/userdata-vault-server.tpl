@@ -267,7 +267,7 @@ echo "${address} ${name}" | sudo tee -a /etc/hosts
 %{ endfor ~}
 
 %{ if tpl_vault_node_name == "leader" }
-# vault_2 adds some test data to demonstrate that the cluster is connected to
+# leader adds some test data to demonstrate that the cluster is connected to
 #   the same data.
 sleep 5
 logger "Initializing Vault and storing results for ubuntu user"
