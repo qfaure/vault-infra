@@ -83,7 +83,8 @@ pipeline {
             unstash 'terraform-files'
                 container('terraform') {
                    dir("vault/infrastructure"){
-                      withCredentials([[
+                       script{
+                        withCredentials([[
                         $class: 'AmazonWebServicesCredentialsBinding',
                         credentialsId: "qf-aws",
                         accessKeyVariable: 'AWS_ACCESS_KEY_ID',
@@ -95,6 +96,7 @@ pipeline {
                             env.TF_VAR_VAULT_URL = "${ip}"
                             echo "${env.TF_VAR_VAULT_URL}"
                             }
+                        }
                     }
                 }
             }
@@ -118,6 +120,7 @@ pipeline {
             unstash 'terraform-files'
                 container('terraform') {
                     dir("vault/configuration"){
+                           script{
                         withCredentials([sshUserPrivateKey(credentialsId: 'qd-demo-pem',keyFileVariable: 'SSH_KEY')])
                         {
                             sh 'cp "$SSH_KEY" files/qd-key.pem'
@@ -125,6 +128,7 @@ pipeline {
                             echo 'ssh -l ubuntu ${env.TF_VAR_VAULT_URL} -i files/qd-key.pem "cat ~/root_token"'
                             env.TF_VAR_VAULT_TOKEN = sh(script: 'ssh -l ubuntu ${env.TF_VAR_VAULT_URL} -i qd-key.pem "cat ~/root_token"', returnStdout: true)
                             sh "terragrun run-all plan --terragrunt-non-interactive"
+                            }
                         }
                     }
                 }
