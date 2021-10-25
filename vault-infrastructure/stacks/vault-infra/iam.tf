@@ -2,11 +2,17 @@
 resource "aws_iam_instance_profile" "vault_server" {
   name = "${local.vault_name}-instance-profile"
   role = aws_iam_role.vault_server.name
+       tags  = merge(local.common_tags, {
+     "Name"= "${local.vault_name}-profile"
+  })
 }
 
 resource "aws_iam_role" "vault_server" {
   name               = "${local.vault_name}-role"
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
+       tags  = merge(local.common_tags, {
+     "Name"= "${local.vault_name}-role"
+  })
 }
 
 resource "aws_iam_role_policy" "vault_server" {
@@ -19,11 +25,17 @@ resource "aws_iam_role_policy" "vault_server" {
 resource "aws_iam_instance_profile" "vault_transit" {
   name = "${local.transit_name}-instance-profile"
   role = aws_iam_role.vault_transit.name
+       tags  = merge(local.common_tags, {
+     "Name"= "${local.transit_name}-profile"
+  })
 }
 
 resource "aws_iam_role" "vault_transit" {
   name               = "${local.transit_name}-role"
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
+       tags  = merge(local.common_tags, {
+     "Name"= "${local.transit_name}-role"
+  })
 }
 
 resource "aws_iam_role_policy" "vault_transit" {
@@ -57,31 +69,31 @@ data "aws_iam_policy_document" "vault-server" {
     resources = ["*"]
   }
 
-  statement {
-    sid    = "VaultAWSAuthMethod"
-    effect = "Allow"
-    actions = [
-      "ec2:DescribeInstances",
-      "iam:GetInstanceProfile",
-      "iam:GetUser",
-      "iam:GetRole",
-    ]
-    resources = ["*"]
-  }
+//   statement {
+//     sid    = "VaultAWSAuthMethod"
+//     effect = "Allow"
+//     actions = [
+//       "ec2:DescribeInstances",
+//       "iam:GetInstanceProfile",
+//       "iam:GetUser",
+//       "iam:GetRole",
+//     ]
+//     resources = ["*"]
+//   }
 
-  statement {
-    sid    = "VaultKMSUnseal"
-    effect = "Allow"
+//   statement {
+//     sid    = "VaultKMSUnseal"
+//     effect = "Allow"
 
-    actions = [
-      "kms:Encrypt",
-      "kms:Decrypt",
-      "kms:DescribeKey",
-    ]
+//     actions = [
+//       "kms:Encrypt",
+//       "kms:Decrypt",
+//       "kms:DescribeKey",
+//     ]
 
-    resources = ["*"]
-  }
-}
+//     resources = ["*"]
+//   }
+ }
 
 data "aws_iam_policy_document" "vault-transit" {
   statement {

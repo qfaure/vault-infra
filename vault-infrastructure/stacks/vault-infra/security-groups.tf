@@ -1,11 +1,11 @@
 resource "aws_security_group" "vault" {
-  name        = "${var.environment_name}-sg"
+  name        = "${local.env}-sg"
   description = "SSH and Internal Traffic"
   vpc_id      = module.vault_demo_vpc.vpc_id
 
-  tags = {
-    Name = var.environment_name
-  }
+   tags  = merge(local.common_tags, {
+     "Name"= "${local.vault_name}-sg"
+  })
 
   # SSH
   ingress {

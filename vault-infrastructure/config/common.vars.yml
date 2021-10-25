@@ -1,0 +1,8 @@
+region: "eu-west-1"
+app_name: "vault demo"
+owner: "dev.quentinfaure@gmail.com"
+project_name: "demo-vault"
+feature_name: "infra"
+terraform-git-repo : "qfaure/vault-infra"
+terraform-base-path  : "qfaure/vault-infra/vault-infrastructure"
+

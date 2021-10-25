@@ -9,15 +9,14 @@ resource "aws_instance" "vault-transit" {
   private_ip                  = var.vault_transit_private_ip
   iam_instance_profile        = aws_iam_instance_profile.vault_transit.id
 
-  user_data = templatefile("${path.module}/templates/userdata-vault-transit.tpl", {
+  user_data = templatefile("../templates/userdata-vault-transit.tpl", {
     tpl_vault_zip_file     = var.vault_zip_file
-    tpl_vault_service_name = "vault-${var.environment_name}"
+    tpl_vault_service_name = "vault-${local.env}"
   })
 
-  tags = {
-    Name = "${var.environment_name}-vault-transit"
-  }
-
+  tags  = merge(local.common_tags, {
+      Name = "${local.transit_name}"
+  })
   lifecycle {
     ignore_changes = [
       ami,
@@ -41,20 +40,18 @@ resource "aws_instance" "vault-server" {
   private_ip                  = var.vault_server_private_ips[count.index]
   iam_instance_profile        = aws_iam_instance_profile.vault_server.id
 
-  user_data = templatefile("${path.module}/templates/userdata-vault-server.tpl", {
+  user_data = templatefile("../templates/userdata-vault-server.tpl", {
     tpl_vault_node_name          = var.vault_server_names[count.index],
     tpl_vault_storage_path       = "/vault/${var.vault_server_names[count.index]}",
     tpl_vault_zip_file           = var.vault_zip_file,
-    tpl_vault_service_name       = "vault-${var.environment_name}",
+    tpl_vault_service_name       = "vault-${local.env}",
     tpl_vault_transit_addr       = aws_instance.vault-transit.private_ip
     tpl_vault_node_address_names = zipmap(var.vault_server_private_ips, var.vault_server_names)
   })
 
-  tags = {
-    Name         = "${local.vault_name}-${var.vault_server_names[count.index]}"
-    cluster_name = "raft-test"
-  }
-
+  tags  = merge(local.common_tags, {
+       Name      = "${local.vault_name}-${var.vault_server_names[count.index]}"
+  })
   lifecycle {
     ignore_changes = [ami, tags]
   }
