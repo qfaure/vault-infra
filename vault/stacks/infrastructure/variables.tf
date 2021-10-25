@@ -48,7 +48,7 @@ variable "vault_server_names" {
 variable "vault_server_private_ips" {
   description = "The private ips of the Vault nodes that will join the cluster"
   type        = list(string)
-  default     = ["10.0.101.22", "10.0.101.23", "10.0.101.24"]
+  default     = ["10.0.101.22", "10.0.102.23", "10.0.103.24"]
 }
 
 variable "vault_zip_file" {
