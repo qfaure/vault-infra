@@ -76,13 +76,13 @@ variable "associate_public_ip_address" {
 }
 
 variable "access_key" {
-  default     = "AKIAV4BZS3EKSZ2BAKG5"
+  default     = ""
   type        = string
   description = "access key to be inject by CI"
 }
 
 variable "secret_key" {
-  default     = "hf0fdyxJd5ALpZafKzr1ENnXdl9CTuBLOp40hbEy"
+  default     = ""
   type        = string
   description = "Secret key to be inject by CI"
 }
