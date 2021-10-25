@@ -8,11 +8,11 @@ locals {
 remote_state {
   backend = "s3"
   config = {
-    bucket         = "demo-qf-tfstate-${local.environment}"
+    bucket         = "demo-qf-infra-${local.environment}-tfstate"
     key            = "${path_relative_to_include()}/terraform.tfstate"
     region         = local.aws_region
     encrypt        = true
-    dynamodb_table = "demo-qf-${local.environment}-${local.project_name}-tfstatelock"
+    dynamodb_table = "demo-qf-infra-${local.environment}-tfstatelock"
   }
 }
 
