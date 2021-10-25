@@ -90,7 +90,7 @@ pipeline {
                         secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                         ]]) {
                             sh "terragrunt run-all apply --terragrunt-non-interactive"
-                            def ip = sh(script: 'terraform run-all output leader', returnStdout: true)
+                            def ip = sh(script: 'terragrunt run-all output leader', returnStdout: true)
                             echo "${ip}"
                             env.TF_VAR_VAULT_URL = "${ip}"
                             echo "${env.TF_VAR_VAULT_URL}"
@@ -120,10 +120,9 @@ pipeline {
                 container('terraform') {
                     dir("vault/config/configuration"){
                            script{
-                        withCredentials([sshUserPrivateKey(credentialsId: 'qd-demo-pem',keyFileVariable: 'SSH_KEY')])
+                        withCredentials([sshUserPrivateKey(credentialsId: 'qd-demo-ec2-pem',keyFileVariable: 'SSH_KEY')])
                         {
                             sh 'cp "$SSH_KEY" files/qd-key.pem'
-                            sh 'terraform plan -out tfplan'
                             echo 'ssh -l ubuntu ${env.TF_VAR_VAULT_URL} -i files/qd-key.pem "cat ~/root_token"'
                             env.TF_VAR_VAULT_TOKEN = sh(script: 'ssh -l ubuntu ${env.TF_VAR_VAULT_URL} -i qd-key.pem "cat ~/root_token"', returnStdout: true)
                             sh "terragrunt run-all plan --terragrunt-non-interactive"
