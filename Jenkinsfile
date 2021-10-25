@@ -52,14 +52,14 @@ pipeline {
             steps {
             unstash 'terraform-files'
                 container('terraform') {
-                    dir("vault/infrastructure"){
+                    dir("vault/config/infrastructure"){
                       withCredentials([[
                         $class: 'AmazonWebServicesCredentialsBinding',
                         credentialsId: "qf-aws",
                         accessKeyVariable: 'AWS_ACCESS_KEY_ID',
                         secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                         ]]) {
-                         sh "terragrun run-all plan --terragrunt-non-interactive"
+                         sh "terragrunt run-all plan --terragrunt-non-interactive"
                         }
                     }
                 }
@@ -81,7 +81,7 @@ pipeline {
             steps {
             unstash 'terraform-files'
                 container('terraform') {
-                   dir("vault/infrastructure"){
+                   dir("vault/config/infrastructure"){
                        script{
                         withCredentials([[
                         $class: 'AmazonWebServicesCredentialsBinding',
@@ -89,7 +89,7 @@ pipeline {
                         accessKeyVariable: 'AWS_ACCESS_KEY_ID',
                         secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                         ]]) {
-                            sh "terragrun run-all apply --terragrunt-non-interactive"
+                            sh "terragrunt run-all apply --terragrunt-non-interactive"
                             def ip = sh(script: 'terraform run-all output leader', returnStdout: true)
                             echo "${ip}"
                             env.TF_VAR_VAULT_URL = "${ip}"
@@ -118,7 +118,7 @@ pipeline {
             steps {
             unstash 'terraform-files'
                 container('terraform') {
-                    dir("vault/configuration"){
+                    dir("vault/config/configuration"){
                            script{
                         withCredentials([sshUserPrivateKey(credentialsId: 'qd-demo-pem',keyFileVariable: 'SSH_KEY')])
                         {
@@ -126,7 +126,7 @@ pipeline {
                             sh 'terraform plan -out tfplan'
                             echo 'ssh -l ubuntu ${env.TF_VAR_VAULT_URL} -i files/qd-key.pem "cat ~/root_token"'
                             env.TF_VAR_VAULT_TOKEN = sh(script: 'ssh -l ubuntu ${env.TF_VAR_VAULT_URL} -i qd-key.pem "cat ~/root_token"', returnStdout: true)
-                            sh "terragrun run-all plan --terragrunt-non-interactive"
+                            sh "terragrunt run-all plan --terragrunt-non-interactive"
                             }
                         }
                     }
@@ -149,8 +149,8 @@ pipeline {
             steps {
             unstash 'terraform-files'
               container('terraform') {
-                    dir("vault/configuration"){
-                        sh "terragrun run-all apply --terragrunt-non-interactive"
+                    dir("vault/config/configuration"){
+                        sh "terragrunt run-all apply --terragrunt-non-interactive"
                     }
                 }
             }

@@ -1,5 +1,5 @@
 terraform {
-  source = "${get_parent_terragrunt_dir()}/../stacks//vault-config" # double slash (//) is required
+  source = "${get_parent_terragrunt_dir()}/../stacks//configuration" # double slash (//) is required
 }
 
 include {
