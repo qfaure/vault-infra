@@ -11,13 +11,12 @@ pipeline {
     }
      environment{
           TF_VAR_VAULT_URL=""
-          TF_VAR_VAULT_TOKEN=credentials("token")
         }
 
     stages {
         
         stage('Get files') {
-            agent { label 'terraform:1.0.13' }
+            agent { label 'terraform:1.0' }
             steps {
                 container('terraform') {
                     checkout scm
@@ -43,7 +42,7 @@ pipeline {
 
         stage('Plan dev') {
             agent {
-                label 'terraform:1.0.13'
+                label 'terraform:1.0'
             }
 
             environment {
@@ -74,7 +73,7 @@ pipeline {
 
         stage('Apply on DEV') {
             agent {
-                label 'terraform:1.0.13'
+                label 'terraform:1.0'
             }
             environment {
                 TF_VAR_ENV = "dev"
@@ -109,7 +108,7 @@ pipeline {
 
         stage('Plan Vault config on DEV') {
             agent {
-                label 'terraform:1.0.13'
+                label 'terraform:1.0'
             }
 
             environment {
@@ -142,7 +141,7 @@ pipeline {
 
         stage('Apply Vault configuration on DEV') {
             agent {
-                label 'terraform:1.0.13'
+                label 'terraform:1.0'
             }
             environment {
                 TF_VAR_ENV = "dev"
