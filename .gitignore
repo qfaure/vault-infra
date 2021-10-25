@@ -18,6 +18,7 @@ crash.log
 # are not checked in
 override.tf
 override.tf.json
+**/.terragrunt-cache/*
 *_override.tf
 *_override.tf.json
 
