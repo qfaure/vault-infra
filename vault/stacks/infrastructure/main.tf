@@ -30,7 +30,7 @@ resource "aws_instance" "vault-server" {
   count                       = length(var.vault_server_names)
   ami                         = data.aws_ami.ubuntu.id
   instance_type               = var.instance_type
-  subnet_id                   = module.vault_demo_vpc.public_subnets[0]
+  subnet_id                   = module.vault_demo_vpc.public_subnets[count.index]
   key_name                    = var.key_name
   vpc_security_group_ids      = [aws_security_group.vault.id]
   associate_public_ip_address = var.associate_public_ip_address
