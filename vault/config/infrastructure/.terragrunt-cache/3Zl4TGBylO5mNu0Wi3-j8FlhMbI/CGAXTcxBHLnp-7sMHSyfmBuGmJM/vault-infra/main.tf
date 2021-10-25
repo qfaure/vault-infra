@@ -5,7 +5,7 @@ resource "aws_instance" "vault-transit" {
   subnet_id                   = module.vault_demo_vpc.public_subnets[0]
   key_name                    = var.key_name
   vpc_security_group_ids      = [aws_security_group.vault.id]
-  associate_public_ip_address = true
+  associate_public_ip_address = var.associate_public_ip_address
   private_ip                  = var.vault_transit_private_ip
   iam_instance_profile        = aws_iam_instance_profile.vault_transit.id
 
@@ -14,9 +14,10 @@ resource "aws_instance" "vault-transit" {
     tpl_vault_service_name = "vault-${local.env}"
   })
 
-  tags  = merge(local.common_tags, {
-      Name = "${local.transit_name}"
+  tags = merge(local.common_tags, {
+    Name = "${local.transit_name}"
   })
+
   lifecycle {
     ignore_changes = [
       ami,
@@ -25,10 +26,6 @@ resource "aws_instance" "vault-transit" {
   }
 }
 
-//--------------------------------------------------------------------
-// Vault Server Instance
-
-
 resource "aws_instance" "vault-server" {
   count                       = length(var.vault_server_names)
   ami                         = data.aws_ami.ubuntu.id
@@ -36,7 +33,7 @@ resource "aws_instance" "vault-server" {
   subnet_id                   = module.vault_demo_vpc.public_subnets[0]
   key_name                    = var.key_name
   vpc_security_group_ids      = [aws_security_group.vault.id]
-  associate_public_ip_address = true
+  associate_public_ip_address = var.associate_public_ip_address
   private_ip                  = var.vault_server_private_ips[count.index]
   iam_instance_profile        = aws_iam_instance_profile.vault_server.id
 
@@ -49,8 +46,8 @@ resource "aws_instance" "vault-server" {
     tpl_vault_node_address_names = zipmap(var.vault_server_private_ips, var.vault_server_names)
   })
 
-  tags  = merge(local.common_tags, {
-       Name      = "${local.vault_name}-${var.vault_server_names[count.index]}"
+  tags = merge(local.common_tags, {
+    Name = "${local.vault_name}-${var.vault_server_names[count.index]}"
   })
   lifecycle {
     ignore_changes = [ami, tags]
