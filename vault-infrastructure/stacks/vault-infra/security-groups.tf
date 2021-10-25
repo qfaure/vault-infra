@@ -3,8 +3,8 @@ resource "aws_security_group" "vault" {
   description = "SSH and Internal Traffic"
   vpc_id      = module.vault_demo_vpc.vpc_id
 
-   tags  = merge(local.common_tags, {
-     "Name"= "${local.vault_name}-sg"
+  tags = merge(local.common_tags, {
+    "Name" = "${local.vault_name}-sg"
   })
 
   # SSH

@@ -43,14 +43,14 @@ pipeline {
             }
 
             environment {
-                TF_VAR_ENV = Environment.DEV
+                TF_VAR_ENV = "dev"
             }
 
             steps {
             unstash 'terraform-files'
                 container('terraform') {
                     dir("vault-infrastructure"){
-                         sh "terragrun run-all plan"
+                         sh "terragrun run-all plan --terragrunt-non-interactive"
                     }
                 }
             }
@@ -66,13 +66,13 @@ pipeline {
                 label 'terraform:1.0.13'
             }
             environment {
-                TF_VAR_ENV = Environment.DEV
+                TF_VAR_ENV = "dev"
             }
             steps {
             unstash 'terraform-files'
                 container('terraform') {
                     dir("vault-infrastructure"){
-                        sh "terragrun run-all apply"
+                        sh "terragrun run-all apply --terragrunt-non-interactive"
                     }
                 }
             }
@@ -89,14 +89,14 @@ pipeline {
             }
 
             environment {
-                TF_VAR_ENV = Environment.DEV
+                TF_VAR_ENV = "dev"
             }
 
             steps {
             unstash 'terraform-files'
                 container('terraform') {
                     dir("vault-configuration"){
-                        sh "terragrun run-all plan"
+                        sh "terragrun run-all plan --terragrunt-non-interactive"
                     }
                 }
             }
@@ -112,13 +112,13 @@ pipeline {
                 label 'terraform:1.0.13'
             }
             environment {
-                TF_VAR_ENV = Environment.DEV
+                TF_VAR_ENV = "dev"
             }
             steps {
             unstash 'terraform-files'
               container('terraform') {
                     dir("vault-configuration"){
-                        sh "terragrun run-all apply"
+                        sh "terragrun run-all apply --terragrunt-non-interactive"
                     }
                 }
             }

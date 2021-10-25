@@ -4,12 +4,12 @@ locals {
   transit_name = "${local.env}-vault-transit"
 
   common_tags = {
-    "managed-by"     = "Terraform"
-    "feature-name"   = "vault-demo"
-    "environment"    = var.environment
-    "owner"          = var.owner
-    "component-type" = "infrastructure"
-    "terraform-base-path" = var.terraform-base-path 
+    "managed-by"          = "Terraform"
+    "feature-name"        = "vault-demo"
+    "environment"         = var.environment
+    "owner"               = var.owner
+    "component-type"      = "infrastructure"
+    "terraform-base-path" = var.terraform-base-path
   }
 }
 
