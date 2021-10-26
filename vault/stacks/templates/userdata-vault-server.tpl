@@ -157,6 +157,11 @@ sudo tee /etc/vault.d/vault.hcl <<EOF
 storage "raft" {
   path    = "${tpl_vault_storage_path}"
   node_id = "${tpl_vault_node_name}"
+%{ if tpl_vault_node_name != "leader" }
+  retry_join {
+    leader_api_addr = "http://127.0.0.2:8200"
+  }
+%{ endif }
 }
 
 listener "tcp" {
@@ -292,5 +297,7 @@ logger "Waiting for Vault to finish preparations (10s)"
 sleep 10
 
 %{ endif }
+
+
 
 logger "Complete"

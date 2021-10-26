@@ -9,10 +9,6 @@ pipeline {
         skipDefaultCheckout()
         skipStagesAfterUnstable()
     }
-     environment{
-          TF_VAR_VAULT_URL=""
-        }
-
     stages {
         
         stage('Get files') {
@@ -119,14 +115,14 @@ pipeline {
             unstash 'terraform-files'
                 container('terraform') {
                     dir("vault/config/configuration"){
-                           script{
+                      script{
                         withCredentials([sshUserPrivateKey(credentialsId: 'qd-demo-ec2-pem',keyFileVariable: 'SSH_KEY')])
                         {
-                            sh 'cp "$SSH_KEY" files/qd-key.pem'
-                            echo 'ssh -l ubuntu ${env.TF_VAR_VAULT_URL} -i files/qd-key.pem "cat ~/root_token"'
+                            sh 'cp "$SSH_KEY" qd-key.pem'
+                            echo 'ssh -l ubuntu ${env.TF_VAR_VAULT_URL} -i qd-key.pem "cat ~/root_token"'
                             env.TF_VAR_VAULT_TOKEN = sh(script: 'ssh -l ubuntu ${env.TF_VAR_VAULT_URL} -i qd-key.pem "cat ~/root_token"', returnStdout: true)
                             sh "terragrunt run-all plan --terragrunt-non-interactive"
-                            }
+                        }
                         }
                     }
                 }
