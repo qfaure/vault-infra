@@ -17,7 +17,5 @@ resource "aws_lb" "vault" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.vault.id]
-  subnets         = data.aws_subnet_ids.all.ids
-
-
+  subnets         =     ["subnet-05baa07be1b2d95fc", "subnet-0aa88320e0dd1d2ca", "subnet-0d0f2e5a0b6279017"]//data.aws_subnet_ids.all.ids
 }
