@@ -6,7 +6,7 @@ resource "vault_mount" "production" {
 
 
 resource "vault_generic_secret" "production_secret" {
-    path      = "kv/project_secrets"
+    path      = "production/project_secrets"
     data_json = <<EOT
     {
     "my_secret": "${random_password.production_secret.result}"
