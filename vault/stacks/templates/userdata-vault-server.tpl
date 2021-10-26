@@ -159,7 +159,7 @@ storage "raft" {
   node_id = "${tpl_vault_node_name}"
 %{ if tpl_vault_node_name != "leader" }
   retry_join {
-    leader_api_addr = "http://127.0.0.2:8200"
+    leader_api_addr = "http://leader:8200"
   }
 %{ endif }
 }
@@ -297,7 +297,7 @@ logger "Waiting for Vault to finish preparations (10s)"
 sleep 10
 
 %{ endif }
-
-
-
+%{ if tpl_vault_node_name != "leader" }
+vault operator raft join http://leader:8200
+%{ endif }
 logger "Complete"

@@ -120,8 +120,8 @@ pipeline {
                         {
                             env.TF_VAR_VAULT_URL = "18.202.213.175"
                             sh 'cp "$SSH_KEY" qd-key.pem'
-                            echo 'ssh -l ubuntu ${env.TF_VAR_VAULT_URL} -i qd-key.pem "cat ~/root_token"'
-                            env.TF_VAR_VAULT_TOKEN = sh(script: 'ssh -l ubuntu ${env.TF_VAR_VAULT_URL} -i qd-key.pem "cat ~/root_token"', returnStdout: true)
+                           // echo 'ssh -l ubuntu ${env.TF_VAR_VAULT_URL} -i qd-key.pem "cat ~/root_token"'
+                            env.TF_VAR_VAULT_TOKEN = sh(script: """ssh -l ubuntu ${env.TF_VAR_VAULT_URL} -i qd-key.pem "cat ~/root_token""", returnStdout: true)
                             //sh "terragrunt run-all plan --terragrunt-non-interactive"
                         }
                         }

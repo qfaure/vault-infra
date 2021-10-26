@@ -26,7 +26,7 @@ resource "aws_instance" "vault-transit" {
   }
 }
 
-resource "aws_instance" "vault-server" {
+resource "aws_instance" "vault_server" {
   count                       = length(var.vault_server_names)
   ami                         = data.aws_ami.ubuntu.id
   instance_type               = var.instance_type
