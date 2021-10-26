@@ -86,7 +86,7 @@ pipeline {
                         secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                         ]]) {
                             sh "terragrunt run-all apply --terragrunt-non-interactive"
-                            def ip = sh(script: 'terragrunt run-all output leader', returnStdout: true)
+                            def ip = sh(script: 'terragrunt run-all output -raw leader', returnStdout: true)
                             echo "${ip}"
                             env.TF_VAR_VAULT_URL = "${ip}"
                             echo "${env.TF_VAR_VAULT_URL}"
@@ -117,7 +117,10 @@ pipeline {
                     dir("vault/config/configuration"){
                        script {
                             sshagent(['qd-demo-ec2-pem']) {
-                                env.TF_VAR_VAULT_TOKEN = sh(script: """ssh -o StrictHostKeyChecking=no  -l ubuntu ${env.TF_VAR_VAULT_URL}  \"cat ~/root_token\"""", returnStdout: true)
+                                 echo "${env.TF_VAR_VAULT_URL}"
+                                def command = "ssh -o StrictHostKeyChecking=no -l ubuntu ${env.TF_VAR_VAULT_URL} \"cat ~/root_token\""
+                                echo "${command}"
+                                env.TF_VAR_VAULT_TOKEN = sh(script: "${command}", returnStdout: true).trim()
                                 echo "${env.TF_VAR_VAULT_TOKEN}"
                                 withCredentials([[
                                 $class: 'AmazonWebServicesCredentialsBinding',
@@ -154,8 +157,8 @@ pipeline {
                     dir("vault/config/configuration"){
                         withCredentials([[
                         $class: 'AmazonWebServicesCredentialsBinding',credentialsId: "qf-aws",accessKeyVariable: 'AWS_ACCESS_KEY_ID',secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                            withCredentials([string(credentialsId: 'qf-vault-pwd', variable: 'QF-PWD')]) {
-                            sh "terragrunt run-all apply --terragrunt-non-interactive -var=vault_token=${env.TF_VAR_VAULT_TOKEN} -var=qf-vault-pwd=${QF-PWD}"
+                            withCredentials([string(credentialsId: 'qf-vault-pwd', variable: 'QF_PASSWORD')]) {
+                            sh "terragrunt run-all apply --terragrunt-non-interactive -var=vault_token=${env.TF_VAR_VAULT_TOKEN} -var=qf-vault-pwd=${QF_PASSWORD}"
                             }
                         }
                     }
