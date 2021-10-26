@@ -9,11 +9,10 @@ pipeline {
         skipDefaultCheckout()
         skipStagesAfterUnstable()
     }
-
     stages {
         
         stage('Get files') {
-            agent { label 'terraform:1.0.13' }
+            agent { label 'terraform:1.0' }
             steps {
                 container('terraform') {
                     checkout scm
@@ -39,18 +38,25 @@ pipeline {
 
         stage('Plan dev') {
             agent {
-                label 'terraform:1.0.13'
+                label 'terraform:1.0'
             }
 
             environment {
-                TF_VAR_ENV = Environment.DEV
+                TF_VAR_ENV = "dev"
             }
 
             steps {
             unstash 'terraform-files'
                 container('terraform') {
-                    dir("vault-infrastructure"){
-                         sh "terragrun run-all plan"
+                    dir("vault/config/infrastructure"){
+                      withCredentials([[
+                        $class: 'AmazonWebServicesCredentialsBinding',
+                        credentialsId: "qf-aws",
+                        accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                        secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+                        ]]) {
+                         sh "terragrunt run-all plan --terragrunt-non-interactive"
+                        }
                     }
                 }
             }
@@ -63,16 +69,29 @@ pipeline {
 
         stage('Apply on DEV') {
             agent {
-                label 'terraform:1.0.13'
+                label 'terraform:1.0'
             }
             environment {
-                TF_VAR_ENV = Environment.DEV
+                TF_VAR_ENV = "dev"
             }
             steps {
             unstash 'terraform-files'
                 container('terraform') {
-                    dir("vault-infrastructure"){
-                        sh "terragrun run-all apply"
+                   dir("vault/config/infrastructure"){
+                       script{
+                        withCredentials([[
+                        $class: 'AmazonWebServicesCredentialsBinding',
+                        credentialsId: "qf-aws",
+                        accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                        secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+                        ]]) {
+                            sh "terragrunt run-all apply --terragrunt-non-interactive"
+                            def ip = sh(script: 'terragrunt run-all output -raw leader', returnStdout: true)
+                            echo "${ip}"
+                            env.TF_VAR_VAULT_URL = "${ip}"
+                            echo "${env.TF_VAR_VAULT_URL}"
+                            }
+                        }
                     }
                 }
             }
@@ -85,18 +104,35 @@ pipeline {
 
         stage('Plan Vault config on DEV') {
             agent {
-                label 'terraform:1.0.13'
+                label 'terraform:1.0'
             }
 
             environment {
-                TF_VAR_ENV = Environment.DEV
+                TF_VAR_ENV = "dev"
             }
 
             steps {
             unstash 'terraform-files'
                 container('terraform') {
-                    dir("vault-configuration"){
-                        sh "terragrun run-all plan"
+                    dir("vault/config/configuration"){
+                       script {
+                            sshagent(['qd-demo-ec2-pem']) {
+                                 echo "${env.TF_VAR_VAULT_URL}"
+                                def command = "ssh -o StrictHostKeyChecking=no -l ubuntu ${env.TF_VAR_VAULT_URL} \"cat ~/root_token\""
+                                echo "${command}"
+                                env.TF_VAR_VAULT_TOKEN = sh(script: "${command}", returnStdout: true).trim()
+                                echo "${env.TF_VAR_VAULT_TOKEN}"
+                                withCredentials([[
+                                $class: 'AmazonWebServicesCredentialsBinding',
+                                credentialsId: "qf-aws",
+                                accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                                secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+                                ]]) 
+                                {
+                                    sh "terragrunt run-all plan --terragrunt-non-interactive -var=vault_token=${env.TF_VAR_VAULT_TOKEN}"
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -109,16 +145,22 @@ pipeline {
 
         stage('Apply Vault configuration on DEV') {
             agent {
-                label 'terraform:1.0.13'
+                label 'terraform:1.0'
             }
             environment {
-                TF_VAR_ENV = Environment.DEV
+                TF_VAR_ENV = "dev"
+
             }
             steps {
             unstash 'terraform-files'
               container('terraform') {
-                    dir("vault-configuration"){
-                        sh "terragrun run-all apply"
+                    dir("vault/config/configuration"){
+                        withCredentials([[
+                        $class: 'AmazonWebServicesCredentialsBinding',credentialsId: "qf-aws",accessKeyVariable: 'AWS_ACCESS_KEY_ID',secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+                            withCredentials([string(credentialsId: 'qf-vault-pwd', variable: 'QF_PASSWORD')]) {
+                            sh "terragrunt run-all apply --terragrunt-non-interactive -var=vault_token=${env.TF_VAR_VAULT_TOKEN} -var=qf-vault-pwd=${QF_PASSWORD}"
+                            }
+                        }
                     }
                 }
             }

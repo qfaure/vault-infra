@@ -1,0 +1,12 @@
+environment: dev
+access_list_readonly:
+  - vault-policy: "dev-phoenix-app-team"
+    vault-entity: "dev"
+  - vault-policy: "dba-phoenix-app-team"
+    vault-entity: "dba"
+
+access_list_admin:
+  - vault-policy: "admin-phoenix-app-team"
+    vault-entity: "admin"
+  - vault-policy: "ops-phoenix-app-team"
+    vault-entity: "ops"
