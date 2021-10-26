@@ -117,7 +117,7 @@ pipeline {
                     dir("vault/config/configuration"){
                        script {
                             sshagent(['qd-demo-ec2-pem']) {
-                                 env.TF_VAR_VAULT_TOKEN = sh(script: """ssh -o StrictHostKeyChecking=no  -l ubuntu ${env.TF_VAR_VAULT_URL} \"cat ~/root_token\"""", returnStdout: true)
+                                env.TF_VAR_VAULT_TOKEN = sh(script: """ssh -o StrictHostKeyChecking=no  -l ubuntu ${env.TF_VAR_VAULT_URL}  \"cat ~/root_token\"""", returnStdout: true)
                                 echo "${env.TF_VAR_VAULT_TOKEN}"
                                 withCredentials([[
                                 $class: 'AmazonWebServicesCredentialsBinding',
