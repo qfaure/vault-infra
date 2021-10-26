@@ -11,30 +11,30 @@ pipeline {
     }
     stages {
         
-        // stage('Get files') {
-        //     agent { label 'terraform:1.0' }
-        //     steps {
-        //         container('terraform') {
-        //             checkout scm
+        stage('Get files') {
+            agent { label 'terraform:1.0' }
+            steps {
+                container('terraform') {
+                    checkout scm
 
-        //             stash includes: '**', name: 'terraform-files'
-        //         }
-        //     }
-        //     post{
-        //         always{
-        //             echo "========always========"
-        //         }
-        //         success{
-        //             echo "========A executed successfully========"
-        //         }
-        //         failure{
-        //             echo "========A execution failed========"
-        //         }
-        //         cleanup {
-        //             cleanWs()
-        //         }
-        //     }
-        // }
+                    stash includes: '**', name: 'terraform-files'
+                }
+            }
+            post{
+                always{
+                    echo "========always========"
+                }
+                success{
+                    echo "========A executed successfully========"
+                }
+                failure{
+                    echo "========A execution failed========"
+                }
+                cleanup {
+                    cleanWs()
+                }
+            }
+        }
 
         // stage('Plan dev') {
         //     agent {
