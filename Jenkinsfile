@@ -128,7 +128,7 @@ pipeline {
                                 secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                                 ]]) 
                                 {
-                                    sh "terragrunt run-all plan --terragrunt-non-interactive"
+                                    sh "terragrunt run-all plan --terragrunt-non-interactive -var=vault_token=${env.TF_VAR_VAULT_TOKEN}"
                                 }
                             }
                         }
@@ -148,6 +148,7 @@ pipeline {
             }
             environment {
                 TF_VAR_ENV = "dev"
+
             }
             steps {
             unstash 'terraform-files'
@@ -160,7 +161,7 @@ pipeline {
                         secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                         ]]) 
                         {
-                            sh "terragrunt run-all apply --terragrunt-non-interactive"
+                            sh "terragrunt run-all apply --terragrunt-non-interactive -var=vault_token=${env.TF_VAR_VAULT_TOKEN}"
                         }
                     }
                 }
