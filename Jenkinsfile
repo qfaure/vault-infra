@@ -155,13 +155,10 @@ pipeline {
               container('terraform') {
                     dir("vault/config/configuration"){
                         withCredentials([[
-                        $class: 'AmazonWebServicesCredentialsBinding',
-                        credentialsId: "qf-aws",
-                        accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-                        secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
-                        ]]) 
-                        {
-                            sh "terragrunt run-all apply --terragrunt-non-interactive -var=vault_token=${env.TF_VAR_VAULT_TOKEN}"
+                        $class: 'AmazonWebServicesCredentialsBinding',credentialsId: "qf-aws",accessKeyVariable: 'AWS_ACCESS_KEY_ID',secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+                            withCredentials([string(credentialsId: 'qf-vault-pwd', variable: 'QF-PWD')]) {
+                            sh "terragrunt run-all apply --terragrunt-non-interactive -var=vault_token=${env.TF_VAR_VAULT_TOKEN} -var=qf-vault-pwd=${QF-PWD}"
+                            }
                         }
                     }
                 }

@@ -29,3 +29,10 @@ variable "aws_region" {
   default     = "eu-west-1"
   description = "the aws region to target"
 }
+
+variable "qf-vault-pwd" {
+  default     = ""
+  type        = string
+  description = "Secret key to be inject by CI"
+  sensitive = true
+}
