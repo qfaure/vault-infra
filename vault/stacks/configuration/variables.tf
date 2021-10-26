@@ -2,21 +2,21 @@ variable "vault_token" {
   default = ""
   description = "The vault token API"
   type = string
-  sensitve = true
+  sensitive = true
 }
 
 variable "access_key" {
   default     = ""
   type        = string
   description = "access key to be inject by CI"
-    sensitve = true
+    sensitive = true
 }
 
 variable "secret_key" {
   default     = ""
   type        = string
   description = "Secret key to be inject by CI"
-    sensitve = true
+  sensitive = true
 }
 
 variable "environment" {
