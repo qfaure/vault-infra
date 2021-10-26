@@ -118,7 +118,6 @@ pipeline {
                        script {
                             sshagent(['qd-demo-ec2-pem']) {
                                 sh "whoami"
-                                env.TF_VAR_VAULT_URL = "34.255.215.129"
                                 env.TF_VAR_VAULT_TOKEN = sh(script: """ssh -o StrictHostKeyChecking=no  -l ubuntu ${env.TF_VAR_VAULT_URL}  \"cat ~/root_token\"""", returnStdout: true)
                                 echo "${env.TF_VAR_VAULT_TOKEN}"
                                 withCredentials([[
