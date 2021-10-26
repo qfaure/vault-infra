@@ -121,7 +121,15 @@ pipeline {
                                 env.TF_VAR_VAULT_URL = "34.255.215.129"
                                 env.TF_VAR_VAULT_TOKEN = sh(script: """ssh -o StrictHostKeyChecking=no  -l ubuntu ${env.TF_VAR_VAULT_URL}  \"cat ~/root_token\"""", returnStdout: true)
                                 echo "${env.TF_VAR_VAULT_TOKEN}"
-                                sh "terragrunt run-all plan --terragrunt-non-interactive"
+                                withCredentials([[
+                                $class: 'AmazonWebServicesCredentialsBinding',
+                                credentialsId: "qf-aws",
+                                accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                                secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+                                ]]) 
+                                {
+                                    sh "terragrunt run-all plan --terragrunt-non-interactive"
+                                }
                             }
                         }
                     }
@@ -145,7 +153,15 @@ pipeline {
             unstash 'terraform-files'
               container('terraform') {
                     dir("vault/config/configuration"){
-                        sh "terragrunt run-all apply --terragrunt-non-interactive"
+                        withCredentials([[
+                        $class: 'AmazonWebServicesCredentialsBinding',
+                        credentialsId: "qf-aws",
+                        accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                        secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+                        ]]) 
+                        {
+                            sh "terragrunt run-all apply --terragrunt-non-interactive"
+                        }
                     }
                 }
             }
