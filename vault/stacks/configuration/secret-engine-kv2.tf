@@ -14,7 +14,7 @@ resource "vault_generic_secret" "production_secret" {
     EOT
 }
 
-resource "random_password" "production_secret_secret" {
+resource "random_password" "production_secret" {
     length = 32
     special = true
 }
