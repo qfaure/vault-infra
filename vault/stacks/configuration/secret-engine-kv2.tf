@@ -12,6 +12,7 @@ resource "vault_generic_secret" "phoenix_app_secret" {
     "my_secret": "${random_password.phoenix_app_secret.result}"
     }
     EOT
+    depends_on = [vault_mount.production]
 }
 
 resource "random_password" "phoenix_app_secret" {

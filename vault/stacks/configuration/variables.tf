@@ -36,3 +36,28 @@ variable "qf-vault-pwd" {
   description = "Secret key to be inject by CI"
   sensitive = true
 }
+
+
+variable "ignore_absent_fields" {
+  default = true
+  type = bool
+  description = "ignore mandatory fields"
+}
+
+variable "access_list_readonly" {
+  description = "list of access in readonly secret in production"
+  type = list(object({
+    vault-policy = string,
+    vault-entity = string
+  }))
+  default = []
+}
+
+variable "access_list_admin" {
+  description = "list of access in ADMIN secret in production"
+  type = list(object({
+    vault-policy = string,
+    vault-entity = string
+  }))
+  default = []
+}
