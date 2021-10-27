@@ -74,6 +74,3 @@ data "aws_iam_policy_document" "vault-transit" {
   }
 }
 
-data "aws_subnet_ids" "all" {
-  vpc_id = module.vault_demo_vpc.vpc_id
-}
