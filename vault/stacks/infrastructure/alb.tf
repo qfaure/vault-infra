@@ -6,7 +6,7 @@ resource "aws_lb_target_group" "vault" {
 }
 
 resource "aws_lb_target_group_attachment" "vault" {
-  count             = length(var.vault_server_names)
+  count            = length(var.vault_server_names)
   target_group_arn = aws_lb_target_group.vault.arn
   target_id        = aws_instance.vault_server.*.id[count.index]
   port             = 8200
@@ -17,5 +17,5 @@ resource "aws_lb" "vault" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.vault.id]
-  subnets         =    module.vault_demo_vpc.public_subnets
+  subnets            = module.vault_demo_vpc.public_subnets
 }

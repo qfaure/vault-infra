@@ -37,30 +37,30 @@ data "aws_iam_policy_document" "vault-server" {
     resources = ["*"]
   }
 
-    statement {
-      sid    = "VaultAWSAuthMethod"
-      effect = "Allow"
-      actions = [
-        "ec2:DescribeInstances",
-        "iam:GetInstanceProfile",
-        "iam:GetUser",
-        "iam:GetRole",
-      ]
-      resources = ["*"]
-    }
+  statement {
+    sid    = "VaultAWSAuthMethod"
+    effect = "Allow"
+    actions = [
+      "ec2:DescribeInstances",
+      "iam:GetInstanceProfile",
+      "iam:GetUser",
+      "iam:GetRole",
+    ]
+    resources = ["*"]
+  }
 
-    statement {
-      sid    = "VaultKMSUnseal"
-      effect = "Allow"
+  statement {
+    sid    = "VaultKMSUnseal"
+    effect = "Allow"
 
-      actions = [
-        "kms:Encrypt",
-        "kms:Decrypt",
-        "kms:DescribeKey",
-      ]
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:DescribeKey",
+    ]
 
-      resources = ["*"]
-    }
+    resources = ["*"]
+  }
 }
 
 data "aws_iam_policy_document" "vault-transit" {
