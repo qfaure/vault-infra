@@ -102,6 +102,13 @@ pipeline {
             }
         }
 
+        stage('Manual Approval for deploying vault') {
+            agent none
+            steps {
+                    input message:'Approve deploying vault config?', ok:'Yes, Deploy'
+            }
+        }
+
         stage('Plan Vault config on DEV') {
             agent {
                 label 'terraform:1.0'
