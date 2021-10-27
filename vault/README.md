@@ -11,71 +11,72 @@ These assets are provided to perform the tasks described in the [Vault HA Cluste
     $ export AWS_SECRET_ACCESS_KEY = "<YOUR_AWS_SECRET_ACCESS_KEY>"
     ```
 
-1.  Use the provided `terraform.tfvars.example` as a base to create a file named
-    `terraform.tfvars` and specify the `key_name`. Be sure to set the correct
-    [key
-    pair](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html)
-    name created in the AWS region that you are using.
+1.  Repository structure :
 
-    Example `terrafrom.tfvars`:
+Config folder will contain variable: 
+>  Files are evaluated/overriden into this order (the later takes predecence):
+> 0. Inputs defined in this file (main terragrunt.hcl)
+> 1. /config/common.vars.yml
+> 2. /config/**/common.vars.yml
+> 3. /config/<TF_VAR_ENV>.vars.yml
+> 4. /config/**/<TF_VAR_ENV>.vars.yml
 
-    ```shell
-    # SSH key name to access EC2 instances (should already exist) on the AWS region
-    key_name = "vault-test"
+stacks folder will contain terraform code.
+```
+└── terraform
+    ├── config   
+    │   ├── sample
+    │   │   └── common.vars.yml
+    │   │   └── dev.vars.yml
+    │   │   └── stage1.vars.yml
+    │   │   └── stage2.vars.yml
+    │   │   └── prod.vars.yml
+    │   │   └── terragrunt.hcl
+    │   └── terragrunt.hcl
+    │   └── common.vars.yml
+    ├── stacks
+    │   ├── sample
+    │   │   └── data.tf
+    │   │   └── provider.tf
+    │   │   └── locals.tf
+    │   │   └── variables.tf
+    │   │   └── samples.tf
+    └── empty.yml
+└── jenkinsfile
 
-    # If you want to use a different AWS region
-    aws_region = "us-west-1"
-    availability_zones = "us-west-1a"
-    ```
+```
 
 1.  Run Terraform commands to provision your cloud resources:
 
     ```plaintext
-    $ terraform init
+    $ terragrunt run-all plan
 
-    $ terraform plan
+    $ terragrunt run-all apply
 
-    $ terraform apply -auto-approve
     ```
 
     The Terraform output will display the IP addresses of the provisioned Vault nodes.
 
     ```plaintext
-    vault_1 (13.56.78.64)  | internal: (10.0.101.21)
-      - Initialized and unsealed.
-      - The root token creates a transit key that enables the other Vaults to auto-unseal.
-      - Does not join the High-Availability (HA) cluster.
-
-    vault_2 (13.56.255.200) | internal: (10.0.101.22)
-      - Initialized and unsealed.
-      - The root token and recovery key is stored in /tmp/key.json.
-      - K/V-V2 secret engine enabled and secret stored.
-      - Leader of HA cluster
-
-      $ ssh -l ubuntu 13.56.255.200 -i <path/to/key.pem>
-
+    vault_transit (x.x.x.x)  | internal: (10.0.101.21)
+    leader (x.x.x.x) | internal: (10.0.101.22)
       # Root token:
-      $ ssh -l ubuntu 13.56.255.200 -i <path/to/key.pem> "cat ~/root_token"
+      $ ssh -l ubuntu x.x.x.x -i <path/to/key.pem> "cat ~/root_token"
       # Recovery key:
-      $ ssh -l ubuntu 13.56.255.200 -i <path/to/key.pem> "cat ~/recovery_key"
+      $ ssh -l ubuntu x.x.x.x -i <path/to/key.pem> "cat ~/recovery_key"
 
-    vault_3 (54.183.62.59) | internal: (10.0.101.23)
-      - Started
-      - You will join it to cluster started by vault_2
+    vault_2 (x.x.x.x) | internal: (10.0.101.23)
+      $ ssh -l ubuntu x.x.x.x -i <path/to/key.pem>
 
-      $ ssh -l ubuntu 54.183.62.59 -i <path/to/key.pem>
-
-    vault_4 (13.57.235.28) | internal: (10.0.101.24)
-      - Started
-      - You will join it to cluster started by vault_2
-
-      $ ssh -l ubuntu 13.57.235.28 -i <path/to/key.pem>
+    vault_3 (x.x.x.x) | internal: (10.0.101.24)
+      $ ssh -l ubuntu x.x.x.x -i <path/to/key.pem>
     ```
 
-1.  SSH into **vault_2**.
+1.  SSH into **leader**.
 
     ```sh
-    ssh -l ubuntu 13.56.255.200 -i <path/to/key.pem>
+    ssh -l ubuntu x.x.x.x -i <path/to/key.pem>
+        vault operator raft list-peers
     ```
 
 1.  Check the current number of servers in the HA Cluster.
@@ -84,57 +85,8 @@ These assets are provided to perform the tasks described in the [Vault HA Cluste
     $ VAULT_TOKEN=$(cat /tmp/key.json | jq -r ".root_token") vault operator raft list-peers
     Node       Address             State     Voter
     ----       -------             -----     -----
-    vault_2    10.0.101.22:8201    leader    true
+    leader    10.0.101.22:8201    leader    true
+    vault_2   10.0.102.23:8201    follower  true
+    vault_3   10.0.103.24:8201    follower  true
     ```
 
-1.  Open a new terminal, SSH into **vault_3**.
-
-    ```plaintext
-    $ ssh -l ubuntu 54.183.62.59 -i <path/to/key.pem>
-    ```
-
-1.  Join **vault_3** to the HA cluster started by **vault_2**.
-
-    ```plaintext
-    $ vault operator raft join http://vault_2:8200
-    ```
-
-1.  Open a new terminal and SSH into **vault_4**
-
-    ```plaintext
-    $ ssh -l ubuntu 13.57.235.28 -i <path/to/key.pem>
-    ```
-
-1.  Join **vault_4** to the HA cluster started by **vault_2**.
-
-    ```plaintext
-    $ vault operator raft join http://vault_2:8200
-    ```
-
-1.  Return to the **vault_2** terminal and check the current number of servers in
-    the HA Cluster.
-
-    ```plaintext
-    $ VAULT_TOKEN=$(cat /tmp/key.json | jq -r ".root_token") vault operator raft list-peers
-
-    Node       Address             State       Voter
-    ----       -------             -----       -----
-    vault_2    10.0.101.22:8201    leader      true
-    vault_3    10.0.101.23:8201    follower    true
-    vault_4    10.0.101.24:8201    follower    true
-    ```
-
-    You should see **vault_2**, **vault_3**, and **vault_4** in the cluster.
-
-**NOTE:** Using the root token stored in the `/tmp/key.json` file, you can log into **vault_3** and **vault_4** as well.
-
-Refer to the [Vault HA Cluster with Integrated Storage](https://learn.hashicorp.com/vault/operations/raft-storage-aws) to learn more about [taking a snapshot](https://learn.hashicorp.com/vault/operations/raft-storage-aws#raft-snapshots-for-data-recovery) and [`retry_join` configuration](https://learn.hashicorp.com/vault/operations/raft-storage-aws#retry-join). 
-
-
-# Clean up the cloud resources
-
-When you are done exploring, execute the `terraform destroy` command to terminal all AWS elements:
-
-```plaintext
-$ terraform destroy -auto-approve
-```
