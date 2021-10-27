@@ -86,7 +86,7 @@ variable "secret_key" {
   default     = ""
   type        = string
   description = "Secret key to be inject by CI"
-  sensitive = true
+  sensitive   = true
 }
 
 variable "vpc_cidr" {

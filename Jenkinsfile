@@ -55,7 +55,7 @@ pipeline {
                         accessKeyVariable: 'AWS_ACCESS_KEY_ID',
                         secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                         ]]) {
-                         sh "terragrunt run-all plan --terragrunt-non-interactive"
+                         sh "terragrunt run-all plan --terragrunt-non-interactive -lock=false"
                         }
                     }
                 }
@@ -85,7 +85,7 @@ pipeline {
                         accessKeyVariable: 'AWS_ACCESS_KEY_ID',
                         secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                         ]]) {
-                            sh "terragrunt run-all apply --terragrunt-non-interactive"
+                            sh "terragrunt run-all apply --terragrunt-non-interactive -lock=false"
                             def ip = sh(script: 'terragrunt run-all output -raw leader', returnStdout: true)
                             echo "${ip}"
                             env.TF_VAR_VAULT_URL = "${ip}"

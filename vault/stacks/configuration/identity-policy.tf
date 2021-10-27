@@ -1,8 +1,8 @@
 
 /////////////POLICY ////////////////
 resource "vault_policy" "phoenix_app_secret_admin" {
-  count      = length(local.access_list_admin)
-  name = local.access_list_admin[count.index]["vault-policy"]
+  count  = length(local.access_list_admin)
+  name   = local.access_list_admin[count.index]["vault-policy"]
   policy = <<EOT
     path "production/*" {
       capabilities = ["read", "list", "update"]
@@ -11,9 +11,9 @@ resource "vault_policy" "phoenix_app_secret_admin" {
 }
 
 resource "vault_identity_entity" "admin" {
-  count      = length(local.access_list_admin)
-  name = local.access_list_admin[count.index]["vault-entity"]
-  policies  = [local.access_list_admin[count.index]["vault-policy"]]
+  count    = length(local.access_list_admin)
+  name     = local.access_list_admin[count.index]["vault-entity"]
+  policies = [local.access_list_admin[count.index]["vault-policy"]]
   metadata = {
     env     = "production"
     service = "phoenix"
@@ -25,8 +25,8 @@ resource "vault_identity_entity" "admin" {
 
 
 resource "vault_policy" "readonly" {
-  count      = length(local.access_list_readonly)
-  name = local.access_list_readonly[count.index]["vault-policy"]
+  count  = length(local.access_list_readonly)
+  name   = local.access_list_readonly[count.index]["vault-policy"]
   policy = <<EOT
   path "production/*" {
     capabilities = ["read", "list"]
@@ -35,9 +35,9 @@ EOT
 }
 
 resource "vault_identity_entity" "readonly" {
-  count      = length(local.access_list_readonly)
-  name = local.access_list_readonly[count.index]["vault-entity"]
-  policies  = [local.access_list_readonly[count.index]["vault-policy"]]
+  count    = length(local.access_list_readonly)
+  name     = local.access_list_readonly[count.index]["vault-entity"]
+  policies = [local.access_list_readonly[count.index]["vault-policy"]]
   metadata = {
     env     = "production"
     service = "project_secrets"

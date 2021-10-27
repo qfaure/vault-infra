@@ -1,22 +1,22 @@
 variable "vault_token" {
-  default = ""
+  default     = ""
   description = "The vault token API"
-  type = string
-  sensitive = true
+  type        = string
+  sensitive   = true
 }
 
 variable "access_key" {
   default     = ""
   type        = string
   description = "access key to be inject by CI"
-    sensitive = true
+  sensitive   = true
 }
 
 variable "secret_key" {
   default     = ""
   type        = string
   description = "Secret key to be inject by CI"
-  sensitive = true
+  sensitive   = true
 }
 
 variable "environment" {
@@ -34,13 +34,13 @@ variable "qf-vault-pwd" {
   default     = ""
   type        = string
   description = "Secret key to be inject by CI"
-  sensitive = true
+  sensitive   = true
 }
 
 
 variable "ignore_absent_fields" {
-  default = true
-  type = bool
+  default     = true
+  type        = bool
   description = "ignore mandatory fields"
 }
 
